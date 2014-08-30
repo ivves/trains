@@ -1,8 +1,10 @@
 package ivves.trains;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static java.text.MessageFormat.format;
+import static java.util.Arrays.asList;
 
 public class Main {
 
@@ -19,26 +21,31 @@ public class Main {
     }
 
     private void outputResults() {
-        output(() -> trains.distance("ABC"));
-        output(() -> trains.distance("AD"));
-        output(() -> trains.distance("ADC"));
-        output(() -> trains.distance("AEBCD"));
-        output(() -> trains.distance("AED"));
-        output(() -> trains.countRoutes("C", "C", "stops < 4"));
-        output(() -> trains.countRoutes("A", "C", "stops = 4"));
-        output(() -> trains.shortestRouteDistance("A", "C"));
-        output(() -> trains.shortestRouteDistance("B", "B"));
-        output(() -> trains.countRoutes("C", "C", "distance < 30"));
+        List<Supplier<Integer>> calculations = asList(
+                () -> trains.distance("ABC"),
+                () -> trains.distance("AD"),
+                () -> trains.distance("ADC"),
+                () -> trains.distance("AEBCD"),
+                () -> trains.distance("AED"),
+                () -> trains.countRoutes("C", "C", "stops < 4"),
+                () -> trains.countRoutes("A", "C", "stops = 4"),
+                () -> trains.shortestRouteDistance("A", "C"),
+                () -> trains.shortestRouteDistance("B", "B"),
+                () -> trains.countRoutes("C", "C", "distance < 30"));
+        calculations.forEach(this::output);
     }
 
-    private void output(Supplier<Integer> msgSupplier) {
+    private void output(Supplier<Integer> resultSupplier) {
         outputCounter++;
-        System.out.println(format("Output #{0}: {1}", outputCounter, getMessage(msgSupplier)));
+        System.out.println(format("Output #{0}: {1}", outputCounter, getResult(resultSupplier)));
     }
 
-    private String getMessage(Supplier<Integer> msgSupplier) {
+    private String getResult(Supplier<Integer> resultSupplier) {
         try {
-            return msgSupplier.get().toString();
+            Integer result = resultSupplier.get();
+            if (result == null)
+                throw new IllegalArgumentException("Calculation result cannot be null");
+            return result.toString();
         } catch (NoSuchRouteException e) {
             return "NO SUCH ROUTE";
         }
