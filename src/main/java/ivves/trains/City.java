@@ -39,4 +39,8 @@ public final class City {
     public Set<City> neighbors() {
         return distancesToNeighbors.keySet();
     }
+
+    public String getName() {
+        return String.valueOf(name);
+    }
 }

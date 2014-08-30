@@ -6,8 +6,8 @@ public class RouteCondition {
 
     enum Operator {LESS_THAN, EQUALS}
 
-    private final Metric metric;
-    private final Operator operator;
+    public final Metric metric;
+    public final Operator operator;
     private final int value;
 
     public static RouteCondition stops(Operator operator, int value) {
@@ -18,9 +18,15 @@ public class RouteCondition {
         return new RouteCondition(Metric.DISTANCE, operator, value);
     }
 
-    public RouteCondition(Metric metric, Operator operator, int value) {
+    private RouteCondition(Metric metric, Operator operator, int value) {
         this.metric = metric;
         this.operator = operator;
         this.value = value;
+    }
+
+    public int getBoundary() {
+        if (operator == Operator.LESS_THAN)
+            return value - 1;
+        return value;
     }
 }

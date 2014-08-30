@@ -2,6 +2,8 @@ package ivves.trains;
 
 import org.junit.Test;
 
+import static ivves.trains.RouteCondition.Operator.*;
+import static ivves.trains.RouteCondition.stops;
 import static org.junit.Assert.assertEquals;
 
 public class TrainsTest {
@@ -23,7 +25,8 @@ public class TrainsTest {
 
     @Test
     public void testCountRoutes() throws Exception {
-
+        assertEquals(2, trains.countRoutes('C', 'C', stops(LESS_THAN, 4)));
+        assertEquals(3, trains.countRoutes('A', 'C', stops(EQUALS, 4)));
     }
 
     @Test
