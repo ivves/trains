@@ -1,7 +1,9 @@
 package ivves.trains;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public final class City {
     private final char name;
@@ -19,12 +21,8 @@ public final class City {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof City)) return false;
-
         City city = (City) o;
-
-        if (name != city.name) return false;
-
-        return true;
+        return name == city.name;
     }
 
     @Override
@@ -36,5 +34,9 @@ public final class City {
         if (distancesToNeighbors.containsKey(neighbor))
             return distancesToNeighbors.get(neighbor);
         throw new NoSuchRouteException();
+    }
+
+    public Set<City> neighbors() {
+        return distancesToNeighbors.keySet();
     }
 }

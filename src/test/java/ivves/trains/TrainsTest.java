@@ -28,6 +28,7 @@ public class TrainsTest {
 
     @Test
     public void testShortestRouteDistance() throws Exception {
-
+        assertEquals(9, trains.shortestRouteDistance('A', 'C'));
+        assertEquals(9, trains.shortestRouteDistance('B', 'B'));
     }
 }

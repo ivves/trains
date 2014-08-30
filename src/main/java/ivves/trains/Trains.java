@@ -1,11 +1,10 @@
 package ivves.trains;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Trains {
+
+    private static final int INFINITY = Integer.MAX_VALUE;
 
     private final Map<Character, City> cityByName = new HashMap<>();
 
@@ -53,6 +52,51 @@ public class Trains {
     }
 
     public int shortestRouteDistance(char start, char finish) {
-        return 0;
+        Map<City, Integer> distances = initDistances();
+        City initialCity = cityByName.get(start);
+        City targetCity = cityByName.get(finish);
+        Set<City> unvisitedCities = new HashSet<>(cityByName.values());
+        for (City neighbor : initialCity.neighbors()) {
+            distances.put(neighbor, initialCity.distanceTo(neighbor));
+        }
+        while (!unvisitedCities.isEmpty() && unvisitedCities.contains(targetCity)) {
+            City currentCity = chooseNextCity(unvisitedCities, distances);
+            if (currentCity == null) {
+                break;
+            }
+            unvisitedCities.remove(currentCity);
+            for (City neighbor : intersection(currentCity.neighbors(), unvisitedCities)) {
+                int currentDistance = distances.get(neighbor);
+                int newDistance = distances.get(currentCity) + currentCity.distanceTo(neighbor);
+                distances.put(neighbor, Math.min(currentDistance, newDistance));
+            }
+        }
+        return distances.get(targetCity);
+    }
+
+    private City chooseNextCity(Set<City> unvisitedCities, Map<City, Integer> distances) {
+        City nearestUnvisitedCity = null;
+        int minDistance = INFINITY;
+        for (City city : unvisitedCities) {
+            if (distances.get(city) < minDistance) {
+                minDistance = distances.get(city);
+                nearestUnvisitedCity = city;
+            }
+        }
+        return nearestUnvisitedCity;
+    }
+
+    private Map<City, Integer> initDistances() {
+        Map<City, Integer> distances = new HashMap<>(cityByName.size());
+        for (City city : cityByName.values()) {
+            distances.put(city, INFINITY);
+        }
+        return distances;
+    }
+
+    private static <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
+        Set<T> result = new HashSet<>(set1);
+        result.retainAll(set2);
+        return result;
     }
 }
