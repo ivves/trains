@@ -13,26 +13,25 @@ public class Main {
 
     public static void main(String... args) {
         Main main = new Main(args);
-        main.outputResults();
+        main.calculationTasks().forEach(main::output);
     }
 
     public Main(String... args) {
         trains = new Trains(args);
     }
 
-    private void outputResults() {
-        List<Supplier<Integer>> calculations = asList(
-                () -> trains.distance("ABC"),
-                () -> trains.distance("AD"),
-                () -> trains.distance("ADC"),
-                () -> trains.distance("AEBCD"),
-                () -> trains.distance("AED"),
-                () -> trains.countRoutes("C", "C", "stops < 4"),
-                () -> trains.countRoutes("A", "C", "stops = 4"),
-                () -> trains.shortestRouteDistance("A", "C"),
-                () -> trains.shortestRouteDistance("B", "B"),
-                () -> trains.countRoutes("C", "C", "distance < 30"));
-        calculations.forEach(this::output);
+    List<Supplier<Integer>> calculationTasks() {
+        return asList(
+                () -> trains.distance('A', 'B', 'C'),
+                () -> trains.distance('A', 'D'),
+                () -> trains.distance('A', 'D', 'C'),
+                () -> trains.distance('A', 'E', 'B', 'C', 'D'),
+                () -> trains.distance('A', 'E', 'D'),
+                () -> trains.countRoutes('C', 'C', "stops < 4"),
+                () -> trains.countRoutes('A', 'C', "stops = 4"),
+                () -> trains.shortestRouteDistance('A', 'C'),
+                () -> trains.shortestRouteDistance('B', 'B'),
+                () -> trains.countRoutes('C', 'C', "distance < 30"));
     }
 
     private void output(Supplier<Integer> resultSupplier) {
