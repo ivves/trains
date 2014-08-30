@@ -47,7 +47,7 @@ public class Trains {
         return result;
     }
 
-    public int countRoutes(char start, char finish, String conditions) {
+    public int countRoutes(char start, char finish, RouteCondition condition) {
         return 0;
     }
 

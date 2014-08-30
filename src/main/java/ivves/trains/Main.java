@@ -1,8 +1,13 @@
 package ivves.trains;
 
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 import java.util.function.Supplier;
 
+import static ivves.trains.RouteCondition.Operator.EQUALS;
+import static ivves.trains.RouteCondition.Operator.LESS_THAN;
+import static ivves.trains.RouteCondition.distance;
+import static ivves.trains.RouteCondition.stops;
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.asList;
 
@@ -27,11 +32,11 @@ public class Main {
                 () -> trains.distance('A', 'D', 'C'),
                 () -> trains.distance('A', 'E', 'B', 'C', 'D'),
                 () -> trains.distance('A', 'E', 'D'),
-                () -> trains.countRoutes('C', 'C', "stops < 4"),
-                () -> trains.countRoutes('A', 'C', "stops = 4"),
+                () -> trains.countRoutes('C', 'C', stops(LESS_THAN, 4)),
+                () -> trains.countRoutes('A', 'C', stops(EQUALS, 4)),
                 () -> trains.shortestRouteDistance('A', 'C'),
                 () -> trains.shortestRouteDistance('B', 'B'),
-                () -> trains.countRoutes('C', 'C', "distance < 30"));
+                () -> trains.countRoutes('C', 'C', distance(LESS_THAN, 30)));
     }
 
     private void output(Supplier<Integer> resultSupplier) {
