@@ -28,11 +28,13 @@ public class TrainsTest {
     public void testCountRoutesByStops() throws Exception {
         assertEquals(2, trains.countRoutes('C', 'C', stops(LESS_THAN, 4)));
         assertEquals(3, trains.countRoutes('A', 'C', stops(EQUALS, 4)));
+        assertEquals(0, trains.countRoutes('B', 'A', stops(LESS_THAN, 10)));
     }
 
     @Test
     public void testCountRoutesByDistance() throws Exception {
         assertEquals(7, trains.countRoutes('C', 'C', distance(30)));
+        assertEquals(0, trains.countRoutes('B', 'A', distance(100)));
     }
 
     @Test
