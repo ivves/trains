@@ -1,6 +1,7 @@
 package ivves.trains;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Trains {
@@ -35,10 +36,10 @@ public class Trains {
         return city;
     }
 
-    public int distance(char... cities) throws NoSuchRouteException {
+    public int distance(String route) throws NoSuchRouteException {
         int result = 0;
         City lastCity = null;
-        for (char cityName : cities) {
+        for (char cityName : route.toCharArray()) {
             City currentCity = cityByName.get(cityName);
             if (lastCity != null) {
                 result += lastCity.distanceTo(currentCity);
@@ -53,22 +54,22 @@ public class Trains {
             throw new IllegalArgumentException("Cannot count routes without condition");
         City initialCity = cityByName.get(start);
         City targetCity = cityByName.get(finish);
-        switch (condition.metric) {
-            case STOPS:
-                return countRoutesByStops(initialCity, targetCity, condition);
-            case DISTANCE:
-                return countRoutesByDistance(initialCity, targetCity, condition);
-            default:
-                throw new IllegalArgumentException("Unsupported condition metric: " + condition.metric);
-        }
-    }
-
-    private int countRoutesByStops(City initialCity, City targetCity, RouteCondition condition) {
-        Map<Integer, Set<String>> routesByStops = generateRoutesByStops(initialCity, condition);
-        Set<String> routesToCount = selectRoutesToCount(routesByStops, condition);
+        Map<Integer, Set<String>> routesByMetric = generateRoutesByMetric(initialCity, condition);
+        Set<String> routesToCount = selectRoutesByOperator(routesByMetric, condition);
         return (int) routesToCount.stream()
                 .filter(route -> route.endsWith(targetCity.getName()))
                 .count();
+    }
+
+    private Map<Integer, Set<String>> generateRoutesByMetric(City initialCity, RouteCondition condition) {
+        switch (condition.metric) {
+            case STOPS:
+                return generateRoutesByStops(initialCity, condition);
+            case DISTANCE:
+                return generateRoutesByDistance(initialCity, condition);
+            default:
+                throw new IllegalArgumentException("Unsupported condition metric: " + condition.metric);
+        }
     }
 
     private Map<Integer, Set<String>> generateRoutesByStops(City initialCity, RouteCondition condition) {
@@ -90,24 +91,48 @@ public class Trains {
         return routesByStops;
     }
 
-    private Set<String> selectRoutesToCount(Map<Integer, Set<String>> routesByStops, RouteCondition condition) {
-        Set<String> routesToCount = new HashSet<>();
-        switch (condition.operator) {
-            case LESS_THAN:
-                routesByStops.forEach((stops, routes) -> routesToCount.addAll(routes));
+    private Map<Integer, Set<String>> generateRoutesByDistance(City initialCity, RouteCondition condition) {
+        Map<Integer, Set<String>> routesByStops = new HashMap<>();
+        Predicate<String> shorterThanBoundary = route -> distance(route) < condition.getBoundary();
+        Set<String> initialRoutes = initialCity.neighbors().stream()
+                .map(c -> initialCity.getName() + c.getName())
+                .filter(shorterThanBoundary)
+                .collect(Collectors.toSet());
+        routesByStops.put(1, initialRoutes);
+        int i = 1;
+        while (true) {
+            i++;
+            Set<String> lastRoutes = routesByStops.get(i - 1);
+            Set<String> currentRoutes = new HashSet<>();
+            for (String route : lastRoutes) {
+                for (City neighbor : lastCity(route).neighbors()) {
+                    String newRoute = route + neighbor.getName();
+                    if (shorterThanBoundary.test(newRoute)) {
+                        currentRoutes.add(newRoute);
+                    }
+                }
+            }
+            if (currentRoutes.isEmpty())
                 break;
-            case EQUALS:
-                routesToCount.addAll(routesByStops.get(condition.getBoundary()));
+            routesByStops.put(i, currentRoutes);
         }
-        return routesToCount;
+        return routesByStops;
     }
 
     private City lastCity(String route) {
         return cityByName.get(route.charAt(route.length()-1));
     }
 
-    private int countRoutesByDistance(City initialCity, City targetCity, RouteCondition condition) {
-        return 0;
+    private Set<String> selectRoutesByOperator(Map<Integer, Set<String>> routesByMetric, RouteCondition condition) {
+        Set<String> routesToCount = new HashSet<>();
+        switch (condition.operator) {
+            case LESS_THAN:
+                routesByMetric.forEach((stops, routes) -> routesToCount.addAll(routes));
+                break;
+            case EQUALS:
+                routesToCount.addAll(routesByMetric.get(condition.getBoundary()));
+        }
+        return routesToCount;
     }
 
     public int shortestRouteDistance(char start, char finish) {

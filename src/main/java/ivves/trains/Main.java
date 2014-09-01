@@ -27,16 +27,16 @@ public class Main {
 
     List<Supplier<Integer>> calculationTasks() {
         return asList(
-                () -> trains.distance('A', 'B', 'C'),
-                () -> trains.distance('A', 'D'),
-                () -> trains.distance('A', 'D', 'C'),
-                () -> trains.distance('A', 'E', 'B', 'C', 'D'),
-                () -> trains.distance('A', 'E', 'D'),
+                () -> trains.distance("ABC"),
+                () -> trains.distance("AD"),
+                () -> trains.distance("ADC"),
+                () -> trains.distance("AEBCD"),
+                () -> trains.distance("AED"),
                 () -> trains.countRoutes('C', 'C', stops(LESS_THAN, 4)),
                 () -> trains.countRoutes('A', 'C', stops(EQUALS, 4)),
                 () -> trains.shortestRouteDistance('A', 'C'),
                 () -> trains.shortestRouteDistance('B', 'B'),
-                () -> trains.countRoutes('C', 'C', distance(LESS_THAN, 30)));
+                () -> trains.countRoutes('C', 'C', distance(30)));
     }
 
     private void output(Supplier<Integer> resultSupplier) {

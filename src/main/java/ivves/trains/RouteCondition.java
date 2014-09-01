@@ -14,8 +14,8 @@ public class RouteCondition {
         return new RouteCondition(Metric.STOPS, operator, value);
     }
 
-    public static RouteCondition distance(Operator operator, int value) {
-        return new RouteCondition(Metric.DISTANCE, operator, value);
+    public static RouteCondition distance(int value) {
+        return new RouteCondition(Metric.DISTANCE, Operator.LESS_THAN, value);
     }
 
     private RouteCondition(Metric metric, Operator operator, int value) {
