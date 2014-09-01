@@ -80,12 +80,10 @@ public class Trains {
         routesByStops.put(1, initialRoutes);
         for (int i = 2; i <= condition.getBoundary(); i++) {
             Set<String> lastRoutes = routesByStops.get(i - 1);
-            Set<String> currentRoutes = new HashSet<>();
-            for (String route : lastRoutes) {
-                for (City neighbor : lastCity(route).neighbors()) {
-                    currentRoutes.add(route + neighbor.getName());
-                }
-            }
+            Set<String> currentRoutes = lastRoutes.stream()
+                    .flatMap(r -> lastCity(r).neighbors().stream()
+                            .map(n -> r + n.getName()))
+                    .collect(Collectors.toSet());
             routesByStops.put(i, currentRoutes);
         }
         return routesByStops;
@@ -100,20 +98,14 @@ public class Trains {
                 .collect(Collectors.toSet());
         routesByStops.put(1, initialRoutes);
         int i = 1;
-        while (true) {
+        while (!routesByStops.get(i).isEmpty()) {
             i++;
             Set<String> lastRoutes = routesByStops.get(i - 1);
-            Set<String> currentRoutes = new HashSet<>();
-            for (String route : lastRoutes) {
-                for (City neighbor : lastCity(route).neighbors()) {
-                    String newRoute = route + neighbor.getName();
-                    if (shorterThanBoundary.test(newRoute)) {
-                        currentRoutes.add(newRoute);
-                    }
-                }
-            }
-            if (currentRoutes.isEmpty())
-                break;
+            Set<String> currentRoutes = lastRoutes.stream()
+                    .flatMap(r -> lastCity(r).neighbors().stream()
+                            .map(n -> r + n.getName()))
+                    .filter(shorterThanBoundary)
+                    .collect(Collectors.toSet());
             routesByStops.put(i, currentRoutes);
         }
         return routesByStops;
